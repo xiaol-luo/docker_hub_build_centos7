@@ -2,4 +2,4 @@ FROM centos:7
 
 MAINTAINER luoxiaolong
 
-RUN install -y wget
+RUN yum install -y wget
