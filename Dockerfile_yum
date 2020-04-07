@@ -20,7 +20,7 @@ RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
 WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
 RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
 
-
+COPY software/mongo-cxx-driver-r3.5.0.tar.gz /root/software
 RUN tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
 WORKDIR /root/build_software/mongo-cxx-driver-r3.5.0/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j4 && make install
