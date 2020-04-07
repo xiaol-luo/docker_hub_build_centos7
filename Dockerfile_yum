@@ -1,0 +1,35 @@
+FROM lxl_cxx/centos_gcc8 as lxl_cpp_centos_gcc8
+
+FROM centos:7
+
+COPY --from=lxl_cpp_centos_gcc8 /usr /usr
+
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+RUN wget -P /etc/yum.repos.d http://mirrors.163.com/.help/CentOS7-Base-163.repo
+RUN yum clean all && yum makecache
+RUN yum install -y epel-release 
+RUN yum install -y centos-release-scl
+
+RUN yum install -y cmake3 && ln -s /usr/bin/cmake3 /usr/bin/cmake
+RUN yum install -y git libuuid-devel openssl-devel cyrus-sasl-devel libicu-develmak
+
+RUN mkdir -p /root/software/
+RUN mkdir -p /root/build_software
+COPY software/mongo-c-driver-1.16.2.tar.gz /root/software
+RUN tar -xJf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
+RUN cmake .. && make  -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -j4 && make install
+
+RUN tar -xJf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-cxx-driver-r3.5.0/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j4 && make install
+
+
+
+
+
+
+
+
+
+
