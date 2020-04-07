@@ -31,5 +31,16 @@ RUN yum remove -y gcc
 RUN yum install -y make
 RUN make install
 
+RUN yum install -y cmake3 && ln -s /usr/bin/cmake3 /usr/bin/cmake
+RUN yum install -y git libuuid-devel openssl-devel cyrus-sasl-devel libicu-devel libbson-devel
+
+RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
+RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
+
+RUN tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-cxx-driver-r3.5.0/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j4 && make install
+
 
 
