@@ -8,9 +8,7 @@ RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
 RUN wget -P /etc/yum.repos.d http://mirrors.163.com/.help/CentOS7-Base-163.repo
 RUN yum clean all && yum makecache
 RUN yum install -y epel-release 
-RUN yum install -y centos-release-scl
-
-
+# RUN yum install -y centos-release-scl
 
 
 
