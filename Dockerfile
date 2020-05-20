@@ -2,9 +2,9 @@ FROM centos:7 as centos_gcc
 
 MAINTAINER luoxiaolong
 
-RUN yum install -y wget
 RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
-RUN wget -P /etc/yum.repos.d http://mirrors.163.com/.help/CentOS7-Base-163.repo
+COPY software/mongo-org-4.2.repo /etc/yum.repos.d/mongo-org-4.2.repo
+COPY software/CentOS7-Base-163.repo /etc/yum.repos.d/CentOS7-Base-163.repo
 RUN yum clean all && yum makecache
 
 RUN yum install -y epel-release 
@@ -55,6 +55,7 @@ RUN tar -xzf /root/software/redis-5.0.8.tar.gz -C /root/build_software
 WORKDIR /root/build_software/redis-5.0.8
 RUN make  -j4 && make install
 
+RUN yum install -y mongodb-org
 RUN yum install -y etcd
 RUN yum install -y net-tools
 
@@ -64,7 +65,7 @@ FROM centos:7
 COPY --from=centos_gcc /usr /usr
 
 RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
-RUN wget -P /etc/yum.repos.d http://mirrors.163.com/.help/CentOS7-Base-163.repo
+COPY software/CentOS7-Base-163.repo /etc/yum.repos.d/CentOS7-Base-163.repo
 RUN yum clean all && yum makecache
 RUN yum install -y epel-release 
 # RUN yum install -y centos-release-scl
