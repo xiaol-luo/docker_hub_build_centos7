@@ -8,7 +8,7 @@ RUN wget -P /etc/yum.repos.d http://mirrors.163.com/.help/CentOS7-Base-163.repo
 RUN yum clean all && yum makecache
 
 RUN yum install -y epel-release 
-RUN yum install -y centos-release-scl
+# RUN yum install -y centos-release-scl
 RUN yum clean all && yum makecache
 
 RUN yum install -y gcc-c++ lbzip2 
@@ -51,6 +51,12 @@ RUN ln -s /usr/local/lib64/libbsoncxx.so._noabi  /lib64/libbsoncxx.so._noabi
 RUN ln -s /usr/local/lib64/libbson-1.0.so.0  /lib64/libbson-1.0.so.0
 RUN ln -s /usr/local/lib64/libmongoc-1.0.so.0  /lib64/libmongoc-1.0.so.0
 
+RUN tar -xzf /root/software/redis-5.0.8.tar.gz -C /root/build_software
+WORKDIR /root/build_software/redis-5.0.8
+RUN make  -j4 && make install
+
+RUN yum install -y etcd
+RUN yum install -y net-tools
 
 
 FROM centos:7
