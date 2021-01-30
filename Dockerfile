@@ -55,6 +55,7 @@ RUN tar -xzf /root/software/redis-5.0.8.tar.gz -C /root/build_software
 WORKDIR /root/build_software/redis-5.0.8
 RUN make  -j4 && make install
 
+RUN yum install -y redis-trib
 RUN yum install -y net-tools bind-utils mongodb-org etcd
 RUN yum install -y python3
 RUN pip3 install jinja2
