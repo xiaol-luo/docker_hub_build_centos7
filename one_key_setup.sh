@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# 设置虚拟内存
+if [ ! -d "/home/swap" ]; then
+    dd if=/dev/zero of=/home/swap bs=1024 count=4096000
+    mkswap /home/swap
+    swapon /home/swap
+    echo '/home/swap swap swap default 0 0' >> /etc/fstab
+fi
 
 
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
@@ -35,6 +42,7 @@ ln -s /lib64/libstdc++.so.6.0.25 /lib64/libstdc++.so.6
 rm -f /usr/bin/cc
 ln -s /usr/local/bin/gcc /usr/bin/cc
 
+yum remove -y cmake
 yum install -y cmake3 && ln -s /usr/bin/cmake3 /usr/bin/cmake
 yum install -y git libuuid-devel openssl-devel cyrus-sasl-devel libicu-devel 
 

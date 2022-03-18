@@ -35,7 +35,9 @@ RUN ln -s /lib64/libstdc++.so.6.0.25 /lib64/libstdc++.so.6
 RUN rm -f /usr/bin/cc
 RUN ln -s /usr/local/bin/gcc /usr/bin/cc
 
-RUN yum install -y cmake3 && ln -s /usr/bin/cmake3 /usr/bin/cmake
+RUN yum remove -y cmake
+RUN yum install -y cmake3
+RUN ln -s /usr/bin/cmake3 /usr/bin/cmake
 RUN yum install -y git libuuid-devel openssl-devel cyrus-sasl-devel libicu-devel 
 
 RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
