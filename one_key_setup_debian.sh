@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # 设置虚拟内存
 if [ ! -d "/home/swap" ]; then
     dd if=/dev/zero of=/home/swap bs=1024 count=4096000
@@ -35,8 +36,21 @@ chmod 755 /usr/local/bin/redis-trib.rb
 
 ldconfig
 
+# install docker
+apt-get update
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
+systemctl enable docker
+
+# 改默认shell，选否
+dpkg-reconfigure dash
 
 
 
