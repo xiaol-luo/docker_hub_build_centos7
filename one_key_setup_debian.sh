@@ -2,10 +2,10 @@
 
 
 # 设置虚拟内存
-if [ ! -d "/home/swap" ]; then
+if [ ! -f "/home/swap" ]; then
     dd if=/dev/zero of=/home/swap bs=1024 count=4096000
     mkswap /home/swap
-	chmod -R 0600 /home/swap
+	  chmod -R 0600 /home/swap
     swapon /home/swap
     echo '/home/swap swap swap default 0 0' >> /etc/fstab
 fi
@@ -25,7 +25,9 @@ cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
 
 tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
 cd /root/build_software/mongo-cxx-driver-r3.5.0/build
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j4 && make install
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
+tar -xzf /root/tmp/docker_hub_build_centos7/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.5.0/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
+make -j4 && make install
 
 
 tar -xzf /root/software/redis-6.2.6.tar.gz -C /root/build_software
@@ -39,6 +41,8 @@ ldconfig
 # install docker
 apt-get update
 sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+rm -f /usr/share/keyrings/docker-archive-keyring.gpg
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
 echo \
@@ -50,7 +54,9 @@ apt-get install -y docker-ce docker-ce-cli containerd.io
 systemctl enable docker
 
 # 改默认shell，选否
-dpkg-reconfigure dash
+# make /bin/sh symlink to bash instead of dash:
+echo "dash dash/sh boolean false" | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 
 
