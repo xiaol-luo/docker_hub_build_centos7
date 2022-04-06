@@ -1,0 +1,39 @@
+
+# 改默认shell，选否
+# make /bin/sh symlink to bash instead of dash:
+echo "dash dash/sh boolean false" | debconf-set-selections
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+
+RUN apt install -y g++ lbzip2 cmake git uuid-dev libssl-dev \
+    libicu-dev libsasl2-dev etcd redis ruby wget git net-tools iputils-ping
+
+RUN pip3 install jinja2
+
+# see https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+RUN apt-get update
+RUN apt-get install -y mongodb-org=5.0.6 mongodb-org-database=5.0.6 mongodb-org-server=5.0.6 mongodb-org-shell=5.0.6 mongodb-org-mongos=5.0.6 mongodb-org-tools=5.0.6
+
+RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
+RUN cd /root/build_software/mongo-c-driver-1.16.2/build
+RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
+
+RUN tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
+RUN cd /root/build_software/mongo-cxx-driver-r3.5.0/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
+RUN tar -xzf /root/tmp/docker_hub_build_centos7/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.5.0/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
+RUN make -j4 && make install
+
+
+RUN tar -xzf /root/software/redis-6.2.6.tar.gz -C /root/build_software
+RUN cd /root/build_software/redis-6.2.6
+RUN make  -j4 && make install
+RUN cp /root/build_software/redis-6.2.6/src/redis-trib.rb /usr/local/bin/
+RUN chmod 755 /usr/local/bin/redis-trib.rb
+
+ldconfig
+
+
+
+
