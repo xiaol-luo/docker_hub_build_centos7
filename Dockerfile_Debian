@@ -1,38 +1,80 @@
+FROM debian:stable-slim as debian_tmp
+
+MAINTAINER luoxiaolong
 
 # 改默认shell，选否
 # make /bin/sh symlink to bash instead of dash:
-echo "dash dash/sh boolean false" | debconf-set-selections
-DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
-RUN apt install -y g++ lbzip2 cmake git uuid-dev libssl-dev \
-    libicu-dev libsasl2-dev etcd redis ruby wget git net-tools iputils-ping
+COPY software/mongo-org-4.2.repo /etc/yum.repos.d/mongo-org-4.2.repo
+# RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
+COPY software/debian_sources.list /etc/apt/sources.list
 
-RUN pip3 install jinja2
+
+
+RUN apt-get update
+RUN apt-get install -y apt-utils
+RUN apt-get update
+
+RUN apt-get install -y g++ 
+RUN apt-get install -y lbzip2
+RUN apt-get install -y  cmake
+RUN apt-get install -y  git
+RUN apt-get install -y  uuid-dev
+RUN apt-get install -y  libssl-dev
+RUN apt-get install -y libicu-dev
+RUN apt-get install -y  libsasl2-dev
+RUN apt-get install -y  etcd
+RUN apt-get install -y  redis
+RUN apt-get install -y  ruby 
+RUN apt-get install -y wget 
+RUN apt-get install -y git 
+RUN apt-get install -y net-tools 
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y gnupg2
+RUN apt-get install -y --reinstall systemd
+RUN apt-get install -y pkg-config
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
+
+COPY software /root/software
+RUN mkdir -p /root/build_software
 
 # see https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc |  apt-key add -
+RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" |  tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 RUN apt-get update
 RUN apt-get install -y mongodb-org=5.0.6 mongodb-org-database=5.0.6 mongodb-org-server=5.0.6 mongodb-org-shell=5.0.6 mongodb-org-mongos=5.0.6 mongodb-org-tools=5.0.6
 
 RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
-RUN cd /root/build_software/mongo-c-driver-1.16.2/build
+WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
 RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
 
 RUN tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
-RUN cd /root/build_software/mongo-cxx-driver-r3.5.0/build
+WORKDIR /root/build_software/mongo-cxx-driver-r3.5.0/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
-RUN tar -xzf /root/tmp/docker_hub_build_centos7/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.5.0/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
+RUN tar -xzf /root/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.5.0/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
 RUN make -j4 && make install
 
 
 RUN tar -xzf /root/software/redis-6.2.6.tar.gz -C /root/build_software
-RUN cd /root/build_software/redis-6.2.6
-RUN make  -j4 && make install
+WORKDIR /root/build_software/redis-6.2.6
+RUN make MALLOC=libc  -j4 && make install
 RUN cp /root/build_software/redis-6.2.6/src/redis-trib.rb /usr/local/bin/
 RUN chmod 755 /usr/local/bin/redis-trib.rb
 
-ldconfig
+RUN ldconfig
+RUN rm -rf /root/software 
+RUN rm -rf /root/build_software
+
+FROM debian:stable-slim
+COPY --from=debian_tmp /usr /usr
+COPY --from=debian_tmp /etc /etc
+RUN apt-get update
+WORKDIR /root
+
+
 
 
 

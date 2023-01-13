@@ -8,6 +8,7 @@ docker build -t lxl_cxx/centos_yum -f /shared/docker/docker_hub_build_centos7/Do
 docker build -t lxl_cxx/centos_env -f /shared/docker/docker_hub_build_centos7/Dockerfile_env  /shared/docker/docker_hub_build_centos7
 
 或者
+# /shared/docker/docker_hub_build_centos7 是上下文路径
 docker build -t lxl_cxx/centos -f /shared/docker/docker_hub_build_centos7/Dockerfile  /shared/docker/docker_hub_build_centos7
 
 或者直接安装在虚拟机上
