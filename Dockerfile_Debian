@@ -69,8 +69,12 @@ RUN rm -rf /root/software
 RUN rm -rf /root/build_software
 
 FROM debian:stable-slim
+# 改默认shell，选否
+# make /bin/sh symlink to bash instead of dash:
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 COPY --from=debian_tmp /usr /usr
-COPY --from=debian_tmp /etc /etc
+COPY --from=debian_tmp /etc/apt/sources.list /etc/apt/sources.list
 RUN apt-get update
 WORKDIR /root
 

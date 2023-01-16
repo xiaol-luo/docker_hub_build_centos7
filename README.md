@@ -14,3 +14,5 @@ docker build -t lxl_cxx/centos -f /shared/docker/docker_hub_build_centos7/Docker
 或者直接安装在虚拟机上
 one_key_setup.sh
 
+# debian
+docker build -t lxl_debian -f /shared/docker/docker_hub_build_centos7/Dockerfile_Debian  /shared/docker/docker_hub_build_centos7
