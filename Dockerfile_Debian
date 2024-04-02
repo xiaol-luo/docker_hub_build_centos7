@@ -10,8 +10,9 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN dpkg-reconfigure dash
 
 COPY software/mongo-org-4.2.repo /etc/yum.repos.d/mongo-org-4.2.repo
-# RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
+RUN rm -f /etc/apt/sources.list 
 COPY software/debian_sources.list /etc/apt/sources.list
+RUN cat /etc/apt/sources.list
 
 
 
@@ -54,10 +55,10 @@ RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
 WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
 RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
 
-RUN tar -xzf /root/software/mongo-cxx-driver-r3.5.0.tar.gz -C /root/build_software
-WORKDIR /root/build_software/mongo-cxx-driver-r3.5.0/build
+RUN tar -xzf /root/software/mongo-cxx-driver-r3.10.1.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-cxx-driver-r3.10.1/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
-RUN tar -xzf /root/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.5.0/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
+# RUN tar -xzf /root/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.10.1/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
 RUN make -j4 && make install
 
 
