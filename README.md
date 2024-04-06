@@ -16,3 +16,5 @@ one_key_setup.sh
 
 # debian
 docker build -t lxl_debian -f /shared/docker/docker_hub_build_centos7/Dockerfile_Debian  /shared/docker/docker_hub_build_centos7
+
+docker build -t lxl_debian -f  `pwd`/Dockerfile_Debian  `pwd`

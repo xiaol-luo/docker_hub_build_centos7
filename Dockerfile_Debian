@@ -51,22 +51,28 @@ RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" | 
 RUN apt-get update
 RUN apt-get install -y mongodb-org=5.0.6 mongodb-org-database=5.0.6 mongodb-org-server=5.0.6 mongodb-org-shell=5.0.6 mongodb-org-mongos=5.0.6 mongodb-org-tools=5.0.6
 
-RUN tar -xzf /root/software/mongo-c-driver-1.16.2.tar.gz -C /root/build_software
-WORKDIR /root/build_software/mongo-c-driver-1.16.2/build
-RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
-
-RUN tar -xzf /root/software/mongo-cxx-driver-r3.10.1.tar.gz -C /root/build_software
-WORKDIR /root/build_software/mongo-cxx-driver-r3.10.1/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
-# RUN tar -xzf /root/software/EP_mnmlstc_core.tar.gz  -C /root/build_software/mongo-cxx-driver-r3.10.1/build/src/bsoncxx/third_party/EP_mnmlstc_core-prefix/src
-RUN make -j4 && make install
-
-
 RUN tar -xzf /root/software/redis-6.2.6.tar.gz -C /root/build_software
 WORKDIR /root/build_software/redis-6.2.6
 RUN make MALLOC=libc  -j4 && make install
 RUN cp /root/build_software/redis-6.2.6/src/redis-trib.rb /usr/local/bin/
 RUN chmod 755 /usr/local/bin/redis-trib.rb
+
+RUN tar -xzf /root/software/EP_mnmlstc_core.tar.gz  -C /root/build_software
+WORKDIR /root/build_software/EP_mnmlstc_core/build
+RUN cmake -DBUILD_TESTING=OFF  ..
+RUN make -j4 && make install
+
+RUN tar -xzf /root/software/mongo-c-driver-1.26.2.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-c-driver-1.26.2/build
+RUN cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make  -j4 && make install
+
+RUN tar -xzf /root/software/mongo-cxx-driver-r3.6.7.tar.gz -C /root/build_software
+WORKDIR /root/build_software/mongo-cxx-driver-r3.6.7/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
+RUN make -j4 && make install
+
+# RUN cp -rf /root/build_software/mongo-cxx-driver-r3.6.7/build/src/bsoncxx/third_party/_deps/core-install/share /usr/local/share
+# RUN cp -rf /root/build_software/mongo-cxx-driver-r3.6.7/build/src/bsoncxx/third_party/_deps/core-install/include /usr/local/include
 
 RUN ldconfig
 RUN rm -rf /root/software 
