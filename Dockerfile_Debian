@@ -1,4 +1,4 @@
-FROM debian:stable-slim as debian_tmp
+FROM debian:bullseye-20240311 as debian_tmp
 
 MAINTAINER luoxiaolong
 
@@ -28,7 +28,7 @@ RUN apt-get install -y  uuid-dev
 RUN apt-get install -y  libssl-dev
 RUN apt-get install -y libicu-dev
 RUN apt-get install -y  libsasl2-dev
-RUN apt-get install -y  etcd
+# RUN apt-get install -y  etcd
 RUN apt-get install -y  redis
 RUN apt-get install -y  ruby 
 RUN apt-get install -y wget 
@@ -41,15 +41,29 @@ RUN apt-get install -y pkg-config
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 RUN apt-get install -y linux-perf
+RUN apt-get install -y gnupg curl
+RUN apt-get install -y vim
+
 
 COPY software /root/software
 RUN mkdir -p /root/build_software
 
 # see https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc |  apt-key add -
-RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/5.0 main" |  tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+RUN curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | gpg -o /usr/share/keyrings/mongodb-server-4.4.gpg --dearmor
+RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 RUN apt-get update
-RUN apt-get install -y mongodb-org=5.0.6 mongodb-org-database=5.0.6 mongodb-org-server=5.0.6 mongodb-org-shell=5.0.6 mongodb-org-mongos=5.0.6 mongodb-org-tools=5.0.6
+# RUN apt-get install -y mongodb-org=7.0.8 mongodb-org-database=7.0.8 mongodb-org-server=7.0.8 mongodb-mongosh=2.2.3 mongodb-org-mongos=7.0.8 mongodb-org-tools=7.0.8
+RUN apt-get install -y mongodb-org=4.4.29
+
+# RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+# RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] http://repo.mongodb.org/apt/debian bullseye/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+# RUN apt-get update
+# RUN apt-get install -y mongodb-org=7.0.8 mongodb-org-database=7.0.8 mongodb-org-server=7.0.8 mongodb-mongosh=2.2.3 mongodb-org-mongos=7.0.8 mongodb-org-tools=7.0.8
+# RUN apt-get install -y mongodb-org
+
+RUN tar -xzf /root/software/etcd-v3.5.13-linux-amd64.tar.gz -C /root/build_software
+WORKDIR /root/build_software/etcd-v3.5.13-linux-amd64
+RUN cp etcd etcdctl etcdutl /usr/bin
 
 RUN tar -xzf /root/software/redis-6.2.6.tar.gz -C /root/build_software
 WORKDIR /root/build_software/redis-6.2.6
@@ -71,14 +85,9 @@ WORKDIR /root/build_software/mongo-cxx-driver-r3.6.7/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..  
 RUN make -j4 && make install
 
-# RUN cp -rf /root/build_software/mongo-cxx-driver-r3.6.7/build/src/bsoncxx/third_party/_deps/core-install/share /usr/local/share
-# RUN cp -rf /root/build_software/mongo-cxx-driver-r3.6.7/build/src/bsoncxx/third_party/_deps/core-install/include /usr/local/include
-
 RUN ldconfig
-RUN rm -rf /root/software 
-RUN rm -rf /root/build_software
 
-FROM debian:stable-slim
+FROM debian:bullseye-20240311
 
 ENV DEBIAN_FRONTEND noninteractive
 
